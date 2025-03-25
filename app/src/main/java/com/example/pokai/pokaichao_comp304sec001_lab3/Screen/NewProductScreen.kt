@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
@@ -17,6 +18,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,14 +34,29 @@ import com.example.pokai.pokaichao_comp304sec001_lab3.Database.DataSource
 import com.example.pokai.pokaichao_comp304sec001_lab3.Database.Product
 import com.example.pokai.pokaichao_comp304sec001_lab3.ViewModel.ProductViewModel
 import java.time.LocalDate
-import java.util.*
 
 @Composable
 fun NewProductScreen(navController: NavController, viewModel: ProductViewModel) {
     var name by remember { mutableStateOf("") }
     var price by remember { mutableStateOf(0.0) }
-    var dateOfDelivery by remember { mutableStateOf(LocalDate.now()) }
-    var category by remember { mutableStateOf("") }
+
+    // dateOfDelivery
+    var dateOfDelivery by remember {
+        mutableStateOf(
+            LocalDate.now()
+        )
+    }
+    var dateString by remember { mutableStateOf(dateOfDelivery.toString()) }
+    var dateError by remember { mutableStateOf(false) }
+
+    // Category
+    val categoryStrings = DataSource.categories.map { stringResource(id = it) }
+    val defaultCategory = categoryStrings[0]
+    var category by remember { mutableStateOf(defaultCategory) }
+    val itemPosition =
+        remember { mutableStateOf(categoryStrings.indexOf(category).coerceAtLeast(0)) }
+
+    // Favorite
     var favorite by remember { mutableStateOf(false) }
 
     Column(
@@ -48,12 +65,14 @@ fun NewProductScreen(navController: NavController, viewModel: ProductViewModel) 
             .padding(16.dp)
     )
     {
+        // Name
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
             label = { Text("Name") }
         )
 
+        // Price
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = price.toString(),
@@ -61,11 +80,23 @@ fun NewProductScreen(navController: NavController, viewModel: ProductViewModel) 
             label = { Text("Price") }
         )
 
+        // Date
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
-            value = dateOfDelivery.toString(),
-            onValueChange = { dateOfDelivery = LocalDate.parse(it) },
-            label = { Text("Date of Delivery") }
+            value = dateString,
+            onValueChange = {
+                dateString = it
+                runCatching {
+                    val parsedDate = LocalDate.parse(it)
+                    dateOfDelivery = parsedDate
+                    dateError = false
+                }.onFailure {
+                    dateError = true
+                }
+            },
+            isError = dateError,
+            label = { Text("Date of Delivery") },
+            suffix = { Text("YYYY-MM-DD") }
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -73,9 +104,6 @@ fun NewProductScreen(navController: NavController, viewModel: ProductViewModel) 
         // Category dropdown
         var expanded by remember {
             mutableStateOf(false)
-        }
-        val itemPosition = remember {
-            mutableStateOf(0)
         }
 
         Box(
@@ -102,24 +130,32 @@ fun NewProductScreen(navController: NavController, viewModel: ProductViewModel) 
                     expanded = false
                 }) {
 
-                DataSource.categories.forEachIndexed { index, username ->
+                categoryStrings.forEachIndexed { index, categoryText ->
                     DropdownMenuItem(text = {
-                        Text(text = stringResource(id = username))
+                        Text(text = categoryText)
                     },
                         onClick = {
                             expanded = false
                             itemPosition.value = index
+                            category = categoryText
                         })
                 }
             }
         }
 
+        // Favorite
         Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(
-            value = favorite.toString(),
-            onValueChange = { favorite = it.toBoolean() },
-            label = { Text("Favorite") }
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            Text(text = "Favorite: $favorite") // 👈 動態顯示 true / false
+            Spacer(modifier = Modifier.width(8.dp))
+            Switch(
+                checked = favorite,
+                onCheckedChange = { favorite = it }
+            )
+        }
 
         val generatedId = remember { (101..999).random() }
         Button(
