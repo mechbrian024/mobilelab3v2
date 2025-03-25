@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">pokaichao_COMP304Sec001_Lab3</string>
+    <string name="app_topBar">Product App</string>
+    <string name="screen_home">Home Screen</string>
+    <string name="screen_product">Product Screen</string>
+    <string name="category_cell_phone">Cell Phone</string>
+    <string name="category_electronics">Electronics</string>
+    <string name="category_appliances">Appliances</string>
+    <string name="category_media">Media</string>
+    <string name="button_new_product">New Product</string>
+    <string name="button_back">Back</string>
+</resources>
