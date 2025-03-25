@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
@@ -17,6 +18,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -60,7 +62,7 @@ fun EditProductScreen(navController: NavController, viewModel: ProductViewModel,
     val itemPosition =
         remember { mutableStateOf(categoryStrings.indexOf(category).coerceAtLeast(0)) }
 
-
+    // Favorite
     var favorite by remember { mutableStateOf(product?.isFavorite ?: false) }
 
     Column(
@@ -148,11 +150,17 @@ fun EditProductScreen(navController: NavController, viewModel: ProductViewModel,
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(
-            value = favorite.toString(),
-            onValueChange = { favorite = it.toBoolean() },
-            label = { Text("Favorite") }
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            Text(text = "Favorite: $favorite") // 👈 動態顯示 true / false
+            Spacer(modifier = Modifier.width(8.dp))
+            Switch(
+                checked = favorite,
+                onCheckedChange = { favorite = it }
+            )
+        }
 
         Button(
             onClick = {
