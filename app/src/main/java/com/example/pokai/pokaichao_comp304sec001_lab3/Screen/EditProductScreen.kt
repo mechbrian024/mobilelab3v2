@@ -162,6 +162,8 @@ fun EditProductScreen(navController: NavController, viewModel: ProductViewModel,
             )
         }
 
+        // update button
+        Spacer(modifier = Modifier.height(8.dp))
         Button(
             onClick = {
                 if (name.isNotEmpty() && price.toDouble() > 0) {
@@ -182,6 +184,20 @@ fun EditProductScreen(navController: NavController, viewModel: ProductViewModel,
                 .padding(top = 16.dp)
         ) {
             Text("Change")
+        }
+
+        // delete button
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(
+            onClick = {
+                viewModel.delete(product)
+                navController.popBackStack()
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+        ){
+            Text("Delete")
         }
     }
 }
