@@ -17,4 +17,8 @@ class ProductRepository(private val productDao: ProductDao) {
     suspend fun delete(product: Product) {
         productDao.delete(product)
     }
+
+    fun getProductById(productId: Int): Flow<Product?> {
+        return productDao.getProductById(productId)
+    }
 }

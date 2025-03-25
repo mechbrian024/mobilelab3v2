@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pokai.pokaichao_comp304sec001_lab3.Database.Product
 import com.example.pokai.pokaichao_comp304sec001_lab3.Database.ProductRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,4 +29,5 @@ class ProductViewModel(private val repository: ProductRepository) : ViewModel() 
     fun insert(product: Product) = viewModelScope.launch { repository.insert(product) }
     fun update(product: Product) = viewModelScope.launch { repository.update(product) }
     fun delete(product: Product) = viewModelScope.launch { repository.delete(product) }
+    fun getProductById(productId: Int): Flow<Product?> = repository.getProductById(productId)
 }
