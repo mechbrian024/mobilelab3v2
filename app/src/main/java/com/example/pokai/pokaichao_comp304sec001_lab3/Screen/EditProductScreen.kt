@@ -19,7 +19,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,24 +30,19 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.pokai.pokaichao_comp304sec001_lab3.Database.DataSource
-import com.example.pokai.pokaichao_comp304sec001_lab3.Database.Product
 import com.example.pokai.pokaichao_comp304sec001_lab3.ViewModel.ProductViewModel
 import java.time.LocalDate
 
 @Composable
 fun EditProductScreen(navController: NavController, viewModel: ProductViewModel, productId: Int) {
 
-//    val productsState =
-//        viewModel.allProducts.collectAsStateWithLifecycle(initialValue = emptyList())
-
-    //    val product by viewModel.getProductById(productId).collectAsState(initial = null)
-
     val products by viewModel.allProducts.collectAsStateWithLifecycle(initialValue = emptyList())
     val product = products.find { it.id == productId } ?: return
 
-
     var name by remember { mutableStateOf(product?.name ?: "") }
     var price by remember { mutableStateOf(product?.price ?: 0.0) }
+
+    // dateOfDelivery
     var dateOfDelivery by remember {
         mutableStateOf(
             LocalDate.parse(
@@ -56,11 +50,17 @@ fun EditProductScreen(navController: NavController, viewModel: ProductViewModel,
             )
         )
     }
-    var category by remember {
-        mutableStateOf(
-            product?.category ?: DataSource.categories[0].toString()
-        )
-    }
+    var dateString by remember { mutableStateOf(dateOfDelivery.toString()) }
+    var dateError by remember { mutableStateOf(false) }
+
+    // Category
+    val categoryStrings = DataSource.categories.map { stringResource(id = it) }
+    val defaultCategory = product?.category ?: categoryStrings[0]
+    var category by remember { mutableStateOf(defaultCategory) }
+    val itemPosition =
+        remember { mutableStateOf(categoryStrings.indexOf(category).coerceAtLeast(0)) }
+
+
     var favorite by remember { mutableStateOf(product?.isFavorite ?: false) }
 
     Column(
@@ -69,12 +69,14 @@ fun EditProductScreen(navController: NavController, viewModel: ProductViewModel,
             .padding(16.dp)
     )
     {
+        // Name
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
             label = { Text("Name") }
         )
 
+        // Price
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = price.toString(),
@@ -82,21 +84,31 @@ fun EditProductScreen(navController: NavController, viewModel: ProductViewModel,
             label = { Text("Price") }
         )
 
+        // Date
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
-            value = dateOfDelivery.toString(),
-            onValueChange = { dateOfDelivery = LocalDate.parse(it) },
-            label = { Text("Date of Delivery") }
+            value = dateString,
+
+            onValueChange = {
+                dateString = it
+                runCatching {
+                    val parsedDate = LocalDate.parse(it)
+                    dateOfDelivery = parsedDate
+                    dateError = false
+                }.onFailure {
+                    dateError = true
+                }
+            },
+            isError = dateError,
+            label = { Text("Date of Delivery") },
+            suffix = { Text("YYYY-MM-DD") }
+
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
         // Category dropdown
+        Spacer(modifier = Modifier.height(8.dp))
         var expanded by remember {
             mutableStateOf(false)
-        }
-        val itemPosition = remember {
-            mutableStateOf(0)
         }
 
         Box(
@@ -122,14 +134,14 @@ fun EditProductScreen(navController: NavController, viewModel: ProductViewModel,
                 onDismissRequest = {
                     expanded = false
                 }) {
-
-                DataSource.categories.forEachIndexed { index, username ->
+                categoryStrings.forEachIndexed { index, categoryText ->
                     DropdownMenuItem(text = {
-                        Text(text = stringResource(id = username))
+                        Text(text = categoryText)
                     },
                         onClick = {
                             expanded = false
                             itemPosition.value = index
+                            category = categoryText
                         })
                 }
             }
