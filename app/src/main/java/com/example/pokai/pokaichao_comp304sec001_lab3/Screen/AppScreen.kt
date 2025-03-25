@@ -8,12 +8,6 @@ import com.example.pokai.pokaichao_comp304sec001_lab3.Database.ProductRepository
 import com.example.pokai.pokaichao_comp304sec001_lab3.R
 import com.example.pokai.pokaichao_comp304sec001_lab3.ViewModel.ProductViewModel
 
-//All screens
-enum class Screen(@StringRes val title: Int) {
-    Home(title = R.string.screen_home),
-    Product(title = R.string.screen_product)
-}
-
 @Composable
 fun AppScreen(
     productRepository: ProductRepository,

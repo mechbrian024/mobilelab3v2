@@ -1,13 +1,16 @@
 package com.example.pokai.pokaichao_comp304sec001_lab3.Screen
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -41,7 +44,7 @@ fun HomeScreen(navController: NavController, viewModel: ProductViewModel) {
     val products = productsState.value
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Product List") }) },
+        topBar = { TopAppBar(title = { Text("Products") }) },
         floatingActionButton = {
             FloatingActionButton(onClick = { navController.navigate("addProduct") }) {
                 Text("+")
@@ -50,11 +53,11 @@ fun HomeScreen(navController: NavController, viewModel: ProductViewModel) {
     ) { padding ->
         Column(
             modifier = Modifier
-                .padding(12.dp),
+                .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
+            verticalArrangement = Arrangement.SpaceBetween
 
+        ) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -65,19 +68,36 @@ fun HomeScreen(navController: NavController, viewModel: ProductViewModel) {
                     ProductListItem(product = product)
                 }
             }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp)
+            ) {
+                Button(onClick = { showFavoritesOnly = false }) {
+                    Text("Show All Products")
+                }
+
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center)
+                {
+                    Button(onClick = { showFavoritesOnly = true }) {
+                        Text("Show Favorites")
+                    }
+                }
+            }
         }
+
     }
 }
 
 @Composable
 fun ProductListItem(product: Product) {
-    val cardSize: Dp = 400.dp
+    val cardSize: Dp = 100.dp
 
     Card(
         modifier = Modifier
-            .size(cardSize)
+            .fillMaxWidth()
+            .height(cardSize)
             .padding(16.dp)
-            .aspectRatio(1f)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
