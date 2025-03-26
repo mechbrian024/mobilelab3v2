@@ -68,4 +68,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
     implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
     kapt(libs.androidx.room.compiler)
+
+    implementation(libs.bundles.koin)
 }

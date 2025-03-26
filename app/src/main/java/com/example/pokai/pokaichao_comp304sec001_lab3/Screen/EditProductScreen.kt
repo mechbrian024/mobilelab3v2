@@ -1,5 +1,6 @@
 package com.example.pokai.pokaichao_comp304sec001_lab3.Screen
 
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,7 +37,12 @@ import com.example.pokai.pokaichao_comp304sec001_lab3.ViewModel.ProductViewModel
 import java.time.LocalDate
 
 @Composable
-fun EditProductScreen(navController: NavController, viewModel: ProductViewModel, productId: Int) {
+fun EditProductScreen(
+    navController: NavController,
+    viewModel: ProductViewModel,
+    productId: Int,
+    context: Context
+) {
 
     val products by viewModel.allProducts.collectAsStateWithLifecycle(initialValue = emptyList())
     val product = products.find { it.id == productId } ?: return
@@ -75,6 +81,8 @@ fun EditProductScreen(navController: NavController, viewModel: ProductViewModel,
             .padding(16.dp)
     )
     {
+
+
         // Name
         OutlinedTextField(
             value = name,

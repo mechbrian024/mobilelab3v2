@@ -1,5 +1,7 @@
 package com.example.pokai.pokaichao_comp304sec001_lab3.Screen
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.pokai.pokaichao_comp304sec001_lab3.Database.DataSource
 import com.example.pokai.pokaichao_comp304sec001_lab3.Database.Product
@@ -36,7 +39,10 @@ import com.example.pokai.pokaichao_comp304sec001_lab3.ViewModel.ProductViewModel
 import java.time.LocalDate
 
 @Composable
-fun NewProductScreen(navController: NavController, viewModel: ProductViewModel) {
+fun NewProductScreen(navController: NavController, viewModel: ProductViewModel, context: Context) {
+
+    var productId by remember { mutableStateOf(0) }
+    var productIdError by remember { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
 
     // price
@@ -69,6 +75,20 @@ fun NewProductScreen(navController: NavController, viewModel: ProductViewModel) 
             .padding(16.dp)
     )
     {
+        // ID
+        OutlinedTextField(
+            value = productId.toString(),
+            onValueChange = {
+                productId = it.toIntOrNull() ?: 0
+//                val products by viewModel.allProducts.collectAsStateWithLifecycle(initialValue = emptyList())
+//                val product = products.find { it.id == productId } ?: return
+                if(productId > 999 || productId < 101) productIdError = true
+                else productIdError = false
+            },
+            isError = productIdError,
+            label = { Text("ID (101-999):") }
+        )
+
         // Name
         OutlinedTextField(
             value = name,
@@ -177,20 +197,45 @@ fun NewProductScreen(navController: NavController, viewModel: ProductViewModel) 
             )
         }
 
-        val generatedId = remember { (101..999).random() }
+//        val generatedId = remember { (101..999).random() }
         Button(
             onClick = {
-                if (name.isNotEmpty() && price.toDouble() > 0) {
-                    viewModel.insert(
-                        Product(
-                            id = generatedId,
-                            name = name,
-                            price = price.toDouble(),
-                            dateOfDelivery = dateOfDelivery.toString(),
-                            category = category,
-                            isFavorite = favorite
+                runCatching {
+                    if(productIdError){
+                        val toast = Toast.makeText(context, "Error: Please enter an unused valid ID from 101-999", Toast.LENGTH_SHORT)
+                        toast.show()
+                        throw IllegalArgumentException("Invalid Product ID")
+                    }
+                    else if(name.isEmpty()){
+                        val toast = Toast.makeText(context, "Error: Please enter a name for your product.", Toast.LENGTH_SHORT)
+                        toast.show()
+                        throw IllegalArgumentException("Empty Name Field")
+                    }
+                    else if(price.toDouble() <= 0){
+                        val toast = Toast.makeText(context, "Error: Please enter a positive value for price", Toast.LENGTH_SHORT)
+                        toast.show()
+                        throw IllegalArgumentException("Price must be above 0")
+                    }
+                    else if(dateError){
+                        val toast = Toast.makeText(context, "Error: Please enter a correctly formatted date.", Toast.LENGTH_SHORT)
+                        toast.show()
+                        throw IllegalArgumentException("Invalid Date Format")
+                    }else {
+                        viewModel.insert(
+                            Product(
+                                id = productId,
+                                name = name,
+                                price = price.toDouble(),
+                                dateOfDelivery = dateOfDelivery.toString(),
+                                category = category,
+                                isFavorite = favorite
+                            )
                         )
-                    )
+                    }
+                }.onFailure {
+                    val toast = Toast.makeText(context, "Error: Product not inserted.", Toast.LENGTH_SHORT)
+                    toast.show()
+                }.onSuccess {
                     navController.popBackStack()
                 }
             },
