@@ -38,7 +38,11 @@ import java.time.LocalDate
 @Composable
 fun NewProductScreen(navController: NavController, viewModel: ProductViewModel) {
     var name by remember { mutableStateOf("") }
+
+    // price
     var price by remember { mutableStateOf(0.0) }
+    var priceString by remember { mutableStateOf(price.toString()) }
+    var priceError by remember { mutableStateOf(false) }
 
     // dateOfDelivery
     var dateOfDelivery by remember {
@@ -75,8 +79,24 @@ fun NewProductScreen(navController: NavController, viewModel: ProductViewModel) 
         // Price
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
-            value = price.toString(),
-            onValueChange = { price = it.toDoubleOrNull() ?: 0.0 },
+            value = priceString,
+            onValueChange = {
+                priceString = it
+                runCatching {
+                    val parsed = it.toDouble()
+
+                    val decimalPattern = Regex("""^\d+(\.\d{0,2})?$""") // 小數最多兩位
+                    if (parsed < 0 || !decimalPattern.matches(it)) {
+                        throw IllegalArgumentException("Invalid price")
+                    }
+
+                    price = parsed
+                    priceError = false
+                }.onFailure {
+                    priceError = true
+                }
+            },
+            isError = dateError,
             label = { Text("Price") }
         )
 
@@ -174,6 +194,7 @@ fun NewProductScreen(navController: NavController, viewModel: ProductViewModel) 
                     navController.popBackStack()
                 }
             },
+            enabled = !priceError && !dateError,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp)
