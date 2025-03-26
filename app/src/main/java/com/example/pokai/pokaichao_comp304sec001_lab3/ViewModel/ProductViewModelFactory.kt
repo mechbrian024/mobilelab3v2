@@ -2,10 +2,10 @@ package com.example.pokai.pokaichao_comp304sec001_lab3.ViewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.pokai.pokaichao_comp304sec001_lab3.Database.ProductRepository
+import com.example.pokai.pokaichao_comp304sec001_lab3.Database.ProductRepositoryImpl
 
 class ProductViewModelFactory(
-    private val repository: ProductRepository
+    private val repository: ProductRepositoryImpl
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ProductViewModel::class.java)) {

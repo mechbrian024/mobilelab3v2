@@ -1,5 +1,6 @@
 package com.example.pokai.pokaichao_comp304sec001_lab3
 
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
@@ -20,13 +21,13 @@ enum class ScreenEnum(@StringRes val title: Int) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AppNavigation(navController: NavHostController, viewModel: ProductViewModel) {
+fun AppNavigation(navController: NavHostController, viewModel: ProductViewModel, context : Context) {
     NavHost(navController, startDestination = "home") {
         composable("home") { HomeScreen(navController, viewModel) }
-        composable("addProduct") { NewProductScreen(navController, viewModel) }
+        composable("addProduct") { NewProductScreen(navController, viewModel, context) }
         composable("editProduct/{productId}") { backStackEntry ->
             val productId = backStackEntry.arguments?.getString("productId")?.toIntOrNull()
-            productId?.let { EditProductScreen(navController, viewModel, productId) }
+            productId?.let { EditProductScreen(navController, viewModel, productId, context) }
         }
     }
 }

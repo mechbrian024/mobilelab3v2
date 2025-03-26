@@ -3,14 +3,14 @@ package com.example.pokai.pokaichao_comp304sec001_lab3.ViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pokai.pokaichao_comp304sec001_lab3.Database.Product
-import com.example.pokai.pokaichao_comp304sec001_lab3.Database.ProductRepository
+import com.example.pokai.pokaichao_comp304sec001_lab3.Database.ProductRepositoryImpl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ProductViewModel(private val repository: ProductRepository) : ViewModel() {
+class ProductViewModel(private val repository: ProductRepositoryImpl) : ViewModel() {
     private val _allProducts = MutableStateFlow<List<Product>>(emptyList())
     val allProducts: StateFlow<List<Product>> = _allProducts.asStateFlow()
 
